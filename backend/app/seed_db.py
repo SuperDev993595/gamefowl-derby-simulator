@@ -8,42 +8,55 @@ from app.auth import get_password_hash
 from app.config import settings
 
 
-async def migrate_add_keep_type():
-    """Add keep_type column to entries if missing (for existing DBs)."""
+async def migrate_schema():
+    """Add new columns/tables if missing (for existing DBs)."""
     async with engine.begin() as conn:
-        if "sqlite" in str(engine.url):
-            r = await conn.execute(text(
-                "SELECT name FROM pragma_table_info('entries') WHERE name='keep_type'"
-            ))
-            if r.fetchone() is None:
-                await conn.execute(text(
-                    "ALTER TABLE entries ADD COLUMN keep_type VARCHAR(32) DEFAULT 'bench'"
-                ))
-        else:
-            try:
-                await conn.execute(text(
-                    "ALTER TABLE entries ADD COLUMN keep_type VARCHAR(32) DEFAULT 'bench'"
-                ))
-            except Exception:
-                pass  # Column likely already exists
+        is_sqlite = "sqlite" in str(engine.url)
+        if is_sqlite:
+            for table, col, col_def in [
+                ("entries", "keep_type", "VARCHAR(32) DEFAULT 'bench'"),
+                ("breeds", "description", "TEXT"),
+                ("tournaments", "prize_tier", "VARCHAR(32) DEFAULT 'standard'"),
+                ("users", "google_id", "VARCHAR(255)"),
+            ]:
+                try:
+                    r = await conn.execute(text(
+                        f"SELECT name FROM pragma_table_info('{table}') WHERE name=:name"
+                    ), {"name": col})
+                    if r.fetchone() is None:
+                        await conn.execute(text(
+                            f"ALTER TABLE {table} ADD COLUMN {col} {col_def}"
+                        ))
+                except Exception:
+                    pass
+    # Create new tables (e.g. entry_roosters) via metadata
+    await init_db()
 
 
 async def seed():
     await init_db()
     try:
-        await migrate_add_keep_type()
+        await migrate_schema()
     except Exception as e:
-        print(f"Migration note (ok if column already exists): {e}")
+        print(f"Migration note: {e}")
     async with AsyncSessionLocal() as session:
         r = await session.execute(select(Breed).limit(1))
         if not r.scalar_one_or_none():
             for i, b in enumerate(BREEDS):
-                breed = Breed(name=b["name"], image_filename=b["image"])
+                desc = b.get("description")
+                breed = Breed(name=b["name"], image_filename=b["image"], description=desc)
                 session.add(breed)
                 await session.flush()
                 for d_idx, derby_type in enumerate(DERBY_TYPES):
                     p, s, iq, st, a = get_rating_list(d_idx, i)
                     session.add(BreedTrait(breed_id=breed.id, derby_type=derby_type, power=p, speed=s, intelligence=iq, stamina=st, accuracy=a))
+        else:
+            # Update existing breeds with descriptions if missing
+            for i, b in enumerate(BREEDS):
+                r2 = await session.execute(select(Breed).where(Breed.name == b["name"]))
+                existing = r2.scalar_one_or_none()
+                if existing and not existing.description and "description" in b:
+                    existing.description = b["description"]
         ru = await session.execute(select(User).where(User.email == "admin@example.com"))
         if not ru.scalar_one_or_none():
             admin_user = User(

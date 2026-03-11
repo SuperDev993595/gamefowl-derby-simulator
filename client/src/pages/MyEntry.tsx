@@ -69,7 +69,7 @@ export default function MyEntry() {
               <img src={breedImageUrl(b.image_filename)} alt={b.name} />
               <h3>{b.name}</h3>
               <p className="breed-description">
-                A classic gamefowl breed. Traits vary by derby type and keep style.
+                {b.description || "A classic gamefowl breed. Traits vary by derby type and keep style."}
               </p>
               {ratings.length === 5 && (
                 <ul className="breed-qualities">

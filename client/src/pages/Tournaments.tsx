@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../api";
+import { api, entryCostForTier } from "../api";
 import type { TournamentResponse } from "../api";
 import { useAuth } from "../auth";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,19 @@ const DERBY_DESCRIPTIONS: Record<string, string> = {
   short_heel: "The old timer's favorite.",
   pilipino: "Fast and furious.",
   mexican: "Powerful but smart.",
+};
+
+const DERBY_ICONS: Record<string, string> = {
+  long_heel: "🥊",
+  short_heel: "⚔️",
+  pilipino: "⚡",
+  mexican: "💪",
+};
+
+const PRIZE_TIER_LABELS: Record<string, string> = {
+  standard: "Standard",
+  grand: "Grand",
+  prestigious: "Prestigious",
 };
 
 export default function Tournaments() {
@@ -58,13 +71,13 @@ export default function Tournaments() {
         <ul className="tournament-list">
           {list.map((t) => (
             <li key={t.id} className="tournament-card">
-              <h3>{t.name}</h3>
+              <h3><span className="derby-icon" aria-hidden="true">{DERBY_ICONS[t.derby_type] ?? "🎯"}</span> {t.name}</h3>
               <p>{DERBY_LABELS[t.derby_type] || t.derby_type} · {t.total_rounds} rounds</p>
               {DERBY_DESCRIPTIONS[t.derby_type] && (
                 <p className="derby-desc">{DERBY_DESCRIPTIONS[t.derby_type]}</p>
               )}
-              <p className="entry-fee">Entry fee: 10 coins</p>
-              <p className="prize-tier">Prize tier: Standard</p>
+              <p className="entry-fee">Entry fee: {entryCostForTier(t.prize_tier)} coins</p>
+              <p className="prize-tier">Prize tier: {PRIZE_TIER_LABELS[t.prize_tier ?? "standard"] ?? "Standard"}</p>
               <p>Status: <strong>{t.status}</strong> · Entries: {t.entry_count ?? 0}</p>
               {(t.status === "draft" || t.status === "scheduled") && (
                 <Link to={`/enter/${t.id}`}>Enter this derby</Link>

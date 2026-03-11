@@ -1,27 +1,27 @@
 """Breed names and image filenames. Trait ratings from TRAIT RATINGS.xlsx (P.S.I.St.A per derby type)."""
 
-# Canonical breed order (1-20). Image filenames: some breeds have spaces (BROWN RED, SID TAYLOR, THOMPSON WHITE).
+# Canonical breed order (1-20). Image filenames: some breeds have spaces. Short descriptions per frontend guide.
 BREEDS = [
-    {"name": "HATCH", "image": "HATCH.jpg"},
-    {"name": "KELSO", "image": "KELSO.jpg"},
-    {"name": "CLARET", "image": "CLARET.jpg"},
-    {"name": "ROUNDHEAD", "image": "ROUNDHEAD.jpg"},
-    {"name": "WHITEHACKLE", "image": "WHITEHACKLE.jpg"},
-    {"name": "BUTCHER", "image": "BUTCHER.jpg"},
-    {"name": "SWEATER", "image": "SWEATER.jpg"},
-    {"name": "MUFF", "image": "MUFF.jpg"},
-    {"name": "TOPPY", "image": "TOPPY.jpg"},
-    {"name": "REDQUILL", "image": "REDQUILL.jpg"},
-    {"name": "MUG", "image": "MUG.jpg"},
-    {"name": "BROWNRED", "image": "BROWN RED.jpg"},
-    {"name": "BLUE", "image": "BLUE.jpg"},
-    {"name": "SID TAYLOR", "image": "SID TAYLOR.jpg"},
-    {"name": "GREY", "image": "GREY.jpg"},
-    {"name": "PYLE", "image": "PYLE.jpg"},
-    {"name": "THOMPSON WHITE", "image": "THOMPSON WHITE.jpg"},
-    {"name": "HENNY", "image": "HENNY.jpg"},
-    {"name": "PUMPKIN", "image": "PUMPKIN.jpg"},
-    {"name": "DOM", "image": "DOM.jpg"},
+    {"name": "HATCH", "image": "HATCH.jpg", "description": "A classic American strain known for power and gameness. Strong in the heel."},
+    {"name": "KELSO", "image": "KELSO.jpg", "description": "Famous for speed and intelligence. Quick to strike and adapt."},
+    {"name": "CLARET", "image": "CLARET.jpg", "description": "Irish heritage. Balanced fighter with good stamina and accuracy."},
+    {"name": "ROUNDHEAD", "image": "ROUNDHEAD.jpg", "description": "Intelligent and agile. Excels in derbies that reward timing."},
+    {"name": "WHITEHACKLE", "image": "WHITEHACKLE.jpg", "description": "Powerful and durable. A favorite in long, demanding derbies."},
+    {"name": "BUTCHER", "image": "BUTCHER.jpg", "description": "Aggressive and accurate. Known for decisive, clean strikes."},
+    {"name": "SWEATER", "image": "SWEATER.jpg", "description": "Speed and intelligence. Thrives in fast-paced derbies."},
+    {"name": "MUFF", "image": "MUFF.jpg", "description": "Strong power and recovery. Traditional choice for heel derbies."},
+    {"name": "TOPPY", "image": "TOPPY.jpg", "description": "Balanced across all qualities. A reliable all-rounder."},
+    {"name": "REDQUILL", "image": "REDQUILL.jpg", "description": "Exceptional speed and accuracy. Dominant in Pilipino-style derbies."},
+    {"name": "MUG", "image": "MUG.jpg", "description": "High accuracy and cunning. Low endurance but deadly precision."},
+    {"name": "BROWNRED", "image": "BROWN RED.jpg", "description": "Solid power and speed. Consistent performer in any derby."},
+    {"name": "BLUE", "image": "BLUE.jpg", "description": "Intelligent and well-rounded. Strong in stamina and accuracy."},
+    {"name": "SID TAYLOR", "image": "SID TAYLOR.jpg", "description": "Speed and agility. Best in derbies that favor quick exchanges."},
+    {"name": "GREY", "image": "GREY.jpg", "description": "Durable and accurate. Excels in long, strategic derbies."},
+    {"name": "PYLE", "image": "PYLE.jpg", "description": "Power and stamina. A force in endurance-heavy derbies."},
+    {"name": "THOMPSON WHITE", "image": "THOMPSON WHITE.jpg", "description": "Extreme speed and reflex. High risk, high reward."},
+    {"name": "HENNY", "image": "HENNY.jpg", "description": "Agile and fast. Strong in speed-focused derbies."},
+    {"name": "PUMPKIN", "image": "PUMPKIN.jpg", "description": "Balanced power and stamina. Reliable in Mexican-style derbies."},
+    {"name": "DOM", "image": "DOM.jpg", "description": "Well-rounded and intelligent. Adapts to any derby style."},
 ]
 
 # Derby type column key for API/DB (per client: Long Heel, Short Heel, Pilipino, Mexican)

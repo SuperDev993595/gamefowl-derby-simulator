@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { api, breedImageUrl } from "../api";
+import { api, breedImageUrl, entryCostForTier } from "../api";
 import type { BreedResponse, TournamentResponse } from "../api";
 import { useAuth } from "../auth";
 
 const QUALITY_NAMES = ["Power", "Speed", "Intelligence", "Accuracy", "Stamina"] as const;
-const ENTRY_FEE_COINS = 10;
+const MAX_ROOSTERS = 10;
 
 function ratingLabel(value: number): string {
   if (value <= 3) return "Low";
@@ -14,7 +14,6 @@ function ratingLabel(value: number): string {
   return "Very High";
 }
 
-// Mirror backend derby/keep modifiers for attribute preview (doc: Dynamic Attribute Adjustment)
 const DERBY_MODS: Record<string, number[]> = {
   long_heel: [1, 1, 1, 1, 1],
   short_heel: [1.15, 0.85, 0.95, 1.05, 1.1],
@@ -37,7 +36,7 @@ export default function EnterTournament() {
   const { state, refreshBalance } = useAuth();
   const [tournament, setTournament] = useState<TournamentResponse | null>(null);
   const [breeds, setBreeds] = useState<BreedResponse[]>([]);
-  const [selectedBreedId, setSelectedBreedId] = useState<number | null>(null);
+  const [lineup, setLineup] = useState<number[]>([]); // breed_ids, 1–10
   const [keepType, setKeepType] = useState<"bench" | "flypen">("bench");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -62,16 +61,26 @@ export default function EnterTournament() {
   }
 
   const derbyType = tournament.derby_type;
+  const entryCost = entryCostForTier(tournament.prize_tier);
   const getTraitForDerby = (b: BreedResponse) =>
     b.traits?.find((t) => t.derby_type === derbyType);
+
+  function addToLineup(breedId: number) {
+    if (lineup.length >= MAX_ROOSTERS) return;
+    setLineup((prev) => [...prev, breedId]);
+  }
+
+  function removeFromLineup(index: number) {
+    setLineup((prev) => prev.filter((_, i) => i !== index));
+  }
 
   function handleReturnToSelection() {
     setShowConfirmation(false);
   }
 
   async function handleEnterDerby() {
-    if (selectedBreedId == null) {
-      setError("Select a breed");
+    if (lineup.length === 0) {
+      setError("Select at least one rooster");
       return;
     }
     setSubmitting(true);
@@ -79,7 +88,7 @@ export default function EnterTournament() {
     try {
       await api(`/api/entries/tournaments/${id}/enter`, {
         method: "POST",
-        body: JSON.stringify({ breed_id: selectedBreedId, keep_type: keepType }),
+        body: JSON.stringify({ breed_ids: lineup, keep_type: keepType }),
       });
       await refreshBalance();
       navigate(`/bracket/${id}`);
@@ -90,14 +99,15 @@ export default function EnterTournament() {
     }
   }
 
-  const selectedBreed = selectedBreedId != null ? breeds.find((b) => b.id === selectedBreedId) : null;
-  const baseRatings = selectedBreed ? (() => {
-    const t = getTraitForDerby(selectedBreed);
-    return t ? [t.power, t.speed, t.intelligence, t.accuracy, t.stamina] : [];
-  })() : [];
+  const primaryBreed = lineup.length > 0 ? breeds.find((b) => b.id === lineup[0]) : null;
+  const baseRatings = primaryBreed
+    ? (() => {
+        const t = getTraitForDerby(primaryBreed);
+        return t ? [t.power, t.speed, t.intelligence, t.accuracy, t.stamina] : [];
+      })()
+    : [];
   const adjustedRatings = baseRatings.length === 5 ? adjustedTraits(baseRatings, derbyType, keepType) : [];
-  const canConfirm = selectedBreedId != null;
-  const roosterCount = selectedBreedId != null ? 1 : 0;
+  const canConfirm = lineup.length >= 1;
 
   const derbyLabel = { long_heel: "Long Heel", short_heel: "Short Heel", pilipino: "Pilipino", mexican: "Mexican" }[derbyType] ?? derbyType;
   const keepLabel = keepType === "bench" ? "Bench" : "Flypen";
@@ -109,53 +119,30 @@ export default function EnterTournament() {
         <p className="balance">Tokens: {state.tokenBalance}</p>
       </header>
       <h1>Enter: {tournament.name}</h1>
-      <p>Entry cost: {ENTRY_FEE_COINS} tokens. Choose your rooster (breed) and Keep style.</p>
+      <p>Entry cost: {entryCost} tokens. Select 1–10 roosters (same or mixed breeds), then choose Keep style.</p>
       {error && <p className="error">{error}</p>}
 
       {!showConfirmation ? (
         <>
-          <section className="keep-selection">
-            <h3>The Keep</h3>
-            <div className="keep-options">
-              <label className={keepType === "bench" ? "selected" : ""}>
-                <input
-                  type="radio"
-                  name="keep"
-                  value="bench"
-                  checked={keepType === "bench"}
-                  onChange={() => setKeepType("bench")}
-                />
-                <span><strong>Bench Keep</strong> — Improves endurance, durability, recovery; slightly reduces explosive speed.</span>
-              </label>
-              <label className={keepType === "flypen" ? "selected" : ""}>
-                <input
-                  type="radio"
-                  name="keep"
-                  value="flypen"
-                  checked={keepType === "flypen"}
-                  onChange={() => setKeepType("flypen")}
-                />
-                <span><strong>Flypen Keep</strong> — Improves agility, speed, reflex; slightly reduces stamina.</span>
-              </label>
-            </div>
-          </section>
-
           <h3>Select breed (five qualities for this derby)</h3>
-          <div className="breed-grid">
+          <div className="breed-grid breed-grid-with-desc">
             {breeds.map((b) => {
               const trait = getTraitForDerby(b);
               const ratings = trait
                 ? [trait.power, trait.speed, trait.intelligence, trait.accuracy, trait.stamina]
                 : [];
+              const canAdd = lineup.length < MAX_ROOSTERS;
               return (
                 <button
                   key={b.id}
                   type="button"
-                  className={`breed-card ${selectedBreedId === b.id ? "selected" : ""}`}
-                  onClick={() => setSelectedBreedId(b.id)}
+                  className="breed-card breed-card-with-desc"
+                  onClick={() => canAdd && addToLineup(b.id)}
+                  disabled={!canAdd}
                 >
                   <img src={breedImageUrl(b.image_filename)} alt={b.name} />
                   <span>{b.name}</span>
+                  {b.description && <p className="breed-desc">{b.description}</p>}
                   {ratings.length === 5 && (
                     <ul className="breed-qualities">
                       {QUALITY_NAMES.map((name, i) => (
@@ -163,21 +150,40 @@ export default function EnterTournament() {
                       ))}
                     </ul>
                   )}
+                  {canAdd && <span className="add-hint">+ Add to lineup</span>}
                 </button>
               );
             })}
           </div>
 
+          <section className="keep-selection">
+            <h3>The Keep</h3>
+            <div className="keep-options">
+              <label className={keepType === "bench" ? "selected" : ""}>
+                <input type="radio" name="keep" value="bench" checked={keepType === "bench"} onChange={() => setKeepType("bench")} />
+                <span><strong>Bench Keep</strong> — Improves endurance, durability, recovery; slightly reduces explosive speed.</span>
+              </label>
+              <label className={keepType === "flypen" ? "selected" : ""}>
+                <input type="radio" name="keep" value="flypen" checked={keepType === "flypen"} onChange={() => setKeepType("flypen")} />
+                <span><strong>Flypen Keep</strong> — Improves agility, speed, reflex; slightly reduces stamina.</span>
+              </label>
+            </div>
+          </section>
+
           <div className="entry-lineup-bar">
-            <span className="lineup-label">Roosters entered: {roosterCount} / 10</span>
-            {selectedBreed && <span className="lineup-slot">{selectedBreed.name}</span>}
+            <span className="lineup-label">Roosters entered: {lineup.length} / {MAX_ROOSTERS}</span>
+            {lineup.map((breedId, idx) => {
+              const b = breeds.find((x) => x.id === breedId);
+              return (
+                <span key={`${breedId}-${idx}`} className="lineup-slot">
+                  {b?.name ?? `#${breedId}`}
+                  <button type="button" className="lineup-remove" onClick={() => removeFromLineup(idx)} aria-label="Remove">×</button>
+                </span>
+              );
+            })}
           </div>
 
-          <button
-            type="button"
-            onClick={() => setShowConfirmation(true)}
-            disabled={!canConfirm}
-          >
+          <button type="button" onClick={() => setShowConfirmation(true)} disabled={!canConfirm}>
             Review entry
           </button>
         </>
@@ -186,13 +192,13 @@ export default function EnterTournament() {
           <h3>Derby Entry Confirmation</h3>
           <p><strong>Derby name:</strong> {tournament.name}</p>
           <p><strong>Derby type:</strong> {derbyLabel}</p>
-          <p className="entry-fee"><strong>Entry fee:</strong> {ENTRY_FEE_COINS} coins</p>
-          <p><strong>Roosters entered:</strong> {roosterCount} / 10</p>
+          <p className="entry-fee"><strong>Entry fee:</strong> {entryCost} coins</p>
+          <p><strong>Roosters entered:</strong> {lineup.length} / {MAX_ROOSTERS}</p>
           <p><strong>Keep type:</strong> {keepLabel}</p>
 
-          {adjustedRatings.length === 5 && (
+          {adjustedRatings.length === 5 && primaryBreed && (
             <div className="attr-preview">
-              <p>Adjusted attributes (derby + keep):</p>
+              <p>Primary rooster ({primaryBreed.name}) — adjusted attributes (derby + keep):</p>
               {QUALITY_NAMES.map((name, i) => (
                 <div key={name} className="attr-row">
                   <span className="attr-name">{name}</span>

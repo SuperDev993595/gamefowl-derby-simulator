@@ -3,17 +3,42 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #1a1a2e; color
 a { color: #7eb8da; }
 
 /* Home landing (doc: Pre-Game Landing Page) */
-.home-landing { text-align: center; padding-top: 2rem; }
-.game-title { font-size: 2.5rem; letter-spacing: 0.15em; font-weight: 800; margin-bottom: 0.5rem; text-shadow: 0 0 20px rgba(200,180,120,0.4); }
-.tagline { color: #aaa; margin-bottom: 2rem; }
-.main-menu { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; align-items: center; }
-.menu-btn { display: inline-block; padding: 0.75rem 1.25rem; background: #252545; border: 2px solid #444; border-radius: 8px; font-weight: 600; transition: border-color 0.2s, box-shadow 0.2s; }
-.menu-btn:hover { border-color: #7eb8da; box-shadow: 0 0 12px rgba(126, 184, 218, 0.3); }
+.home-landing { text-align: center; padding-top: 2rem; position: relative; min-height: 80vh; }
+.arena-bg {
+  background: linear-gradient(180deg, #1a1410 0%, #2d2218 30%, #1f2a1a 70%, #1a1410 100%);
+  background-image: linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px), linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.arena-roosters { display: flex; justify-content: center; align-items: flex-end; gap: 2rem; margin: 1.5rem auto 1rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+.arena-roosters .rooster { width: 140px; height: auto; max-height: 160px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5)); animation: rooster-idle 4s ease-in-out infinite; }
+.arena-roosters .rooster.left { transform: scaleX(-1); animation-delay: 0s; }
+.arena-roosters .rooster.right { animation-delay: 0.5s; }
+@keyframes rooster-idle { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.02); } }
+.arena-roosters .rooster.left { transform: scaleX(-1) translateY(0); }
+.arena-roosters .rooster.left { animation-name: rooster-idle-left; }
+@keyframes rooster-idle-left { 0%, 100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-4px); } }
+.light-rays { position: absolute; top: 0; left: 0; right: 0; height: 60%; pointer-events: none; background: linear-gradient(180deg, rgba(255,220,150,0.08) 0%, transparent 60%); animation: rays 8s ease-in-out infinite; }
+@keyframes rays { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+.game-title { font-size: 2.5rem; letter-spacing: 0.15em; font-weight: 800; margin-bottom: 0.5rem; color: #e8d4a0; text-shadow: 0 0 24px rgba(220,180,100,0.5), 0 2px 4px rgba(0,0,0,0.5); position: relative; z-index: 1; }
+.tagline { color: #aaa; margin-bottom: 2rem; position: relative; z-index: 1; }
+.main-menu { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; align-items: center; position: relative; z-index: 1; }
+.menu-btn { display: inline-block; padding: 0.85rem 1.5rem; background: linear-gradient(180deg, #2a2545 0%, #1e1a35 100%); border: 2px solid #4a4566; border-radius: 8px; font-weight: 600; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; }
+.menu-btn:hover { border-color: #7eb8da; box-shadow: 0 0 16px rgba(126, 184, 218, 0.4); transform: translateY(-1px); }
 .balance-inline { margin-left: 1rem; font-weight: 600; color: #8d8; }
 
 .section-desc { color: #aaa; margin-bottom: 1rem; }
 .muted { color: #666; font-size: 0.9rem; }
 .leaderboards-placeholder, .settings-placeholder { background: #252545; padding: 2rem; border-radius: 8px; margin-top: 1rem; }
+.settings-section { margin-bottom: 1.5rem; }
+.settings-section h2 { font-size: 1rem; margin-bottom: 0.5rem; }
+.setting-row { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+.setting-row input { width: auto; }
+.reduce-motion .arena-roosters .rooster { animation: none !important; }
+.reduce-motion .light-rays { animation: none !important; }
+.leaderboard-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.leaderboard-tabs button.active { border-color: #7eb8da; background: #2a3545; }
+.leaderboard-table table { width: 100%; border-collapse: collapse; }
+.leaderboard-table th, .leaderboard-table td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #333; }
 .derby-filter { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
 .breed-gallery.my-entry-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
 .breed-card-large { background: #252545; padding: 1rem; border-radius: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -58,12 +83,19 @@ button:not(:disabled):hover { background: #3a3a5a; }
 .breed-card span { font-size: 0.85rem; margin-top: 0.25rem; }
 .breed-qualities { list-style: none; padding: 0; margin: 0.25rem 0 0; font-size: 0.75rem; color: #aaa; text-align: left; }
 .breed-qualities li { margin: 0.1rem 0; }
+.breed-grid-with-desc .breed-card-with-desc { min-width: 140px; }
+.breed-desc { font-size: 0.7rem; color: #888; margin: 0.25rem 0 0; max-height: 2.4em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.add-hint { font-size: 0.7rem; color: #7eb8da; margin-top: 0.25rem; }
+.entry-lineup-bar .lineup-slot { display: inline-flex; align-items: center; gap: 0.25rem; }
+.lineup-remove { padding: 0 0.35rem; margin: 0; font-size: 1rem; line-height: 1; cursor: pointer; border-radius: 4px; background: #4a2a2a; color: #e88; }
+.lineup-remove:hover { background: #6a3a3a; }
 .keep-selection { margin: 1rem 0; padding: 1rem; background: #252545; border-radius: 8px; }
 .keep-selection h3 { margin: 0 0 0.5rem; }
 .keep-options { display: flex; flex-direction: column; gap: 0.5rem; }
 .keep-options label { display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; padding: 0.5rem; border-radius: 6px; border: 2px solid transparent; }
 .keep-options label.selected { border-color: #7eb8da; background: rgba(126, 184, 218, 0.1); }
 .derby-desc { color: #aaa; font-size: 0.9rem; margin-top: 0.25rem; }
+.derby-icon { margin-right: 0.35rem; }
 .standings table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
 .standings th, .standings td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #333; }
 .standings .winner-msg { color: #8d8; }
@@ -74,4 +106,20 @@ button:not(:disabled):hover { background: #3a3a5a; }
 .match-card .result { font-size: 0.9rem; color: #aaa; margin-top: 0.25rem; }
 .admin-form { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1.5rem; }
 .admin-form h2 { width: 100%; margin: 0 0 0.5rem; }
+.admin-form-label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9rem; }
+.admin-form-label input { width: auto; }
 .admin-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.view-match-btn { font-size: 0.8rem; margin-top: 0.25rem; }
+.match-experience-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
+.match-experience.arena-modal { background: linear-gradient(180deg, #1a1410 0%, #2d2218 50%, #1a0a0a 100%); border: 2px solid #7eb8da; border-radius: 12px; padding: 2rem; max-width: 520px; width: 100%; position: relative; }
+.match-experience-close { position: absolute; top: 0.5rem; right: 0.5rem; background: transparent; border: none; color: #aaa; font-size: 1.5rem; cursor: pointer; padding: 0.25rem; }
+.match-experience-close:hover { color: #fff; }
+.arena-banners { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.arena-banner { flex: 1; padding: 1rem; border-radius: 8px; text-align: center; border: 2px solid #444; }
+.arena-banner.left { background: rgba(80, 60, 40, 0.6); border-color: #6a5a4a; }
+.arena-banner.right { background: rgba(40, 60, 80, 0.6); border-color: #4a5a6a; }
+.banner-name { display: block; font-weight: 700; font-size: 1.1rem; }
+.banner-breed { display: block; font-size: 0.9rem; color: #aaa; }
+.announcer-text { font-style: italic; color: #c8b080; text-align: center; margin: 1rem 0; }
+.match-result-screen { background: rgba(180, 40, 40, 0.25); border: 2px solid #c44; border-radius: 8px; padding: 1.25rem; margin-top: 1rem; }
+.result-text { font-weight: 600; text-align: center; margin: 0; color: #e8c0a0; }

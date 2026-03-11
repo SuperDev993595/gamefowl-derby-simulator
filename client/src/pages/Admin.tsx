@@ -19,6 +19,8 @@ export default function Admin() {
   const [newName, setNewName] = useState("");
   const [newDerbyType, setNewDerbyType] = useState("long_heel");
   const [newRounds, setNewRounds] = useState(10);
+  const [newStartAt, setNewStartAt] = useState("");
+  const [newPrizeTier, setNewPrizeTier] = useState("standard");
   const [advancing, setAdvancing] = useState<number | null>(null);
 
   useEffect(() => {
@@ -39,16 +41,20 @@ export default function Admin() {
   async function createTournament(e: React.FormEvent) {
     e.preventDefault();
     try {
+      const body: { name: string; derby_type: string; total_rounds: number; start_at?: string; prize_tier?: string } = {
+        name: newName || "New Derby",
+        derby_type: newDerbyType,
+        total_rounds: newRounds,
+        prize_tier: newPrizeTier,
+      };
+      if (newStartAt) body.start_at = new Date(newStartAt).toISOString();
       const t = await api<TournamentResponse>("/api/tournaments", {
         method: "POST",
-        body: JSON.stringify({
-          name: newName || "New Derby",
-          derby_type: newDerbyType,
-          total_rounds: newRounds,
-        }),
+        body: JSON.stringify(body),
       });
       setTournaments((prev) => [t, ...prev]);
       setNewName("");
+      setNewStartAt("");
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed");
     }
@@ -120,7 +126,21 @@ export default function Admin() {
           max={20}
           value={newRounds}
           onChange={(e) => setNewRounds(Number(e.target.value))}
+          title="Rounds (10–20)"
         />
+        <label className="admin-form-label">
+          Start date/time (optional):
+          <input
+            type="datetime-local"
+            value={newStartAt}
+            onChange={(e) => setNewStartAt(e.target.value)}
+          />
+        </label>
+        <select value={newPrizeTier} onChange={(e) => setNewPrizeTier(e.target.value)} title="Prize tier">
+          <option value="standard">Standard</option>
+          <option value="grand">Grand</option>
+          <option value="prestigious">Prestigious</option>
+        </select>
         <button type="submit">Create</button>
       </form>
 

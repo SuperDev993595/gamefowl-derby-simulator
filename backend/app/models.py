@@ -40,7 +40,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     username: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
-    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)  # None for SSO-only users
+    google_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True, index=True)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     token_balance: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
@@ -53,6 +54,7 @@ class Breed(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     image_filename: Mapped[str] = mapped_column(String(128), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     traits: Mapped[list["BreedTrait"]] = relationship("BreedTrait", back_populates="breed")
 
@@ -71,6 +73,12 @@ class BreedTrait(Base):
     breed: Mapped["Breed"] = relationship("Breed", back_populates="traits")
 
 
+class PrizeTier(str, enum.Enum):
+    STANDARD = "standard"
+    GRAND = "grand"
+    PRESTIGIOUS = "prestigious"
+
+
 class Tournament(Base):
     __tablename__ = "tournaments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -78,6 +86,7 @@ class Tournament(Base):
     derby_type: Mapped[str] = mapped_column(String(32), nullable=False)
     total_rounds: Mapped[int] = mapped_column(Integer, nullable=False)
     start_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    prize_tier: Mapped[str] = mapped_column(String(32), default=PrizeTier.STANDARD.value)
     status: Mapped[str] = mapped_column(String(32), default=TournamentStatus.DRAFT.value)
     current_round: Mapped[int] = mapped_column(Integer, default=0)
     is_tie_breaker: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -111,6 +120,19 @@ class Entry(Base):
         back_populates="entries",
         foreign_keys=[tournament_id],
     )
+    breed: Mapped["Breed"] = relationship("Breed")
+    entry_roosters: Mapped[list["EntryRooster"]] = relationship("EntryRooster", back_populates="entry", order_by="EntryRooster.slot_index")
+
+
+class EntryRooster(Base):
+    """Lineup of 1-10 roosters per entry. Entry.breed_id is the primary (first) rooster used in matches."""
+    __tablename__ = "entry_roosters"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    entry_id: Mapped[int] = mapped_column(ForeignKey("entries.id"), nullable=False)
+    breed_id: Mapped[int] = mapped_column(ForeignKey("breeds.id"), nullable=False)
+    slot_index: Mapped[int] = mapped_column(Integer, nullable=False)  # 0..9
+
+    entry: Mapped["Entry"] = relationship("Entry", back_populates="entry_roosters")
     breed: Mapped["Breed"] = relationship("Breed")
 
 

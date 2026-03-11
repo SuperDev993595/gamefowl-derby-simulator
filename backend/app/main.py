@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from app.config import settings
 from app.database import init_db
 from app.seed_db import seed
-from app.routers import auth, breeds, tournaments, entries, matches, admin
+from app.routers import auth, breeds, tournaments, entries, matches, admin, leaderboards
 from app.websocket_manager import manager
 
 
@@ -34,6 +34,7 @@ app.include_router(tournaments.router)
 app.include_router(entries.router)
 app.include_router(matches.router)
 app.include_router(admin.router)
+app.include_router(leaderboards.router)
 
 # Serve breed images from resources/breed pics (mount at /breed-pics)
 breed_pics = Path(__file__).resolve().parent.parent.parent / "resources" / "breed pics"

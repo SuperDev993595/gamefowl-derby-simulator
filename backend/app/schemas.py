@@ -46,6 +46,7 @@ class BreedResponse(BaseModel):
     id: int
     name: str
     image_filename: str
+    description: Optional[str] = None
     traits: Optional[list[BreedTraitResponse]] = None
 
     class Config:
@@ -57,6 +58,7 @@ class TournamentCreate(BaseModel):
     derby_type: str
     total_rounds: int = 10
     start_at: Optional[datetime] = None
+    prize_tier: str = "standard"
 
 
 class TournamentUpdate(BaseModel):
@@ -64,6 +66,7 @@ class TournamentUpdate(BaseModel):
     derby_type: Optional[str] = None
     total_rounds: Optional[int] = None
     start_at: Optional[datetime] = None
+    prize_tier: Optional[str] = None
 
 
 class TournamentResponse(BaseModel):
@@ -72,6 +75,7 @@ class TournamentResponse(BaseModel):
     derby_type: str
     total_rounds: int
     start_at: Optional[datetime]
+    prize_tier: str = "standard"
     status: str
     current_round: int
     is_tie_breaker: bool
@@ -84,8 +88,14 @@ class TournamentResponse(BaseModel):
 
 
 class EntryCreate(BaseModel):
-    breed_id: int
+    breed_ids: list[int]  # 1-10 roosters; first is primary for match
     keep_type: str = "bench"
+
+
+class EntryRoosterResponse(BaseModel):
+    breed_id: int
+    breed_name: Optional[str] = None
+    slot_index: int
 
 
 class EntryResponse(BaseModel):
@@ -101,9 +111,12 @@ class EntryResponse(BaseModel):
     created_at: datetime
     username: Optional[str] = None
     breed_name: Optional[str] = None
+    lineup: Optional[list[EntryRoosterResponse]] = None
 
     class Config:
         from_attributes = True
+
+
 
 
 class MatchResponse(BaseModel):

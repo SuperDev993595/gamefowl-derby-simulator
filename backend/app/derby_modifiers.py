@@ -3,12 +3,12 @@ Derby attribute modifiers per client doc "Derby Attribute".
 Each derby type modifies the five core attributes (Power, Speed, Intelligence, Accuracy, Stamina)
 before match simulation. Percentages are applied to base breed traits.
 """
-# (power, speed, intelligence, accuracy, stamina) as multiplier - 1.0 = no change
+# Order matches get_traits: (power, speed, intelligence, stamina, accuracy)
 DERBY_MODIFIERS = {
     "long_heel": (1.0, 1.0, 1.0, 1.0, 1.0),   # The favorite of the South; neutral
-    "short_heel": (1.15, 0.85, 0.95, 1.05, 1.10),   # Power +15%, Speed -15%, etc.
-    "pilipino": (0.95, 1.20, 1.10, 1.15, 0.85),     # Fast and furious
-    "mexican": (1.10, 1.0, 1.05, 1.25, 1.25),       # Powerful but smart
+    "short_heel": (1.15, 0.85, 0.95, 1.10, 1.05),   # P+15%, S-15%, I-5%, St+10%, A+5% (Derby Attribute doc)
+    "pilipino": (0.95, 1.20, 1.10, 0.85, 1.15),     # P-5%, S+20%, I+10%, St-15%, A+15%
+    "mexican": (1.10, 1.0, 1.05, 1.25, 1.25),       # P+10%, S0%, I+5%, St+25%, A+25%
 }
 
 # Keep type: (power, speed, intelligence, accuracy, stamina)

@@ -4,7 +4,7 @@ from app.database import get_db
 from app.models import Tournament, Entry, User, Match
 from app.auth import require_admin
 from app.services.tournament_engine import advance_tournament_round
-from app.config import settings
+from app.config import entry_cost_for_tier, winner_bonus_for_tier
 from app.websocket_manager import manager
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -44,10 +44,14 @@ async def advance_round(
         if winner_entry:
             winner_user = await db.get(User, winner_entry.user_id)
             if winner_user:
-                count_r = await db.execute(select(Entry).where(Entry.tournament_id == tournament_id))
-                entry_count = len(count_r.scalars().all())
-                pool = entry_count * settings.entry_cost_tokens
-                winner_user.token_balance += pool + settings.winner_bonus_tokens
+                from sqlalchemy import func
+                sum_r = await db.execute(
+                    select(func.coalesce(func.sum(Entry.token_cost_paid), 0)).where(Entry.tournament_id == tournament_id)
+                )
+                pool = int(sum_r.scalar() or 0)
+                tier = getattr(t, "prize_tier", "standard")
+                bonus = winner_bonus_for_tier(tier)
+                winner_user.token_balance += pool + bonus
                 await db.commit()
     await manager.broadcast_tournament(tournament_id, event, {"current_round": t.current_round})
     return {"event": event, "current_round": t.current_round}
@@ -86,6 +90,7 @@ async def clone_tournament(
         derby_type=t.derby_type,
         total_rounds=t.total_rounds,
         start_at=t.start_at,
+        prize_tier=getattr(t, "prize_tier", "standard"),
         status="draft",
     )
     db.add(new_t)

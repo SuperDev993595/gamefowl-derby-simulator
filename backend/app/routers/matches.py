@@ -39,3 +39,13 @@ async def list_matches(tournament_id: int, db=Depends(get_db)):
     )
     matches = r.scalars().all()
     return [await _enrich_match(m, db) for m in matches]
+
+
+@router.get("/by-id/{match_id}", response_model=MatchResponse)
+async def get_match(match_id: int, db=Depends(get_db)):
+    """Single match for arena/result view (announcer, result text)."""
+    m = await db.get(Match, match_id)
+    if not m:
+        from fastapi import HTTPException
+        raise HTTPException(404, "Match not found")
+    return await _enrich_match(m, db)

@@ -57,7 +57,7 @@ htmlcov/
 *.tmp
 .cache/
 
-backend/app/_pycache__/
+backend/app/_pycache__/*
 backend/app/routers/__pycache__/
 backend/app/services/__pycache__/*
 backend/app/models/__pycache__/*

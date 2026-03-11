@@ -47,6 +47,7 @@ export type BreedResponse = {
   id: number;
   name: string;
   image_filename: string;
+  description?: string | null;
   traits?: { derby_type: string; power: number; speed: number; intelligence: number; stamina: number; accuracy: number }[];
 };
 
@@ -56,6 +57,7 @@ export type TournamentResponse = {
   derby_type: string;
   total_rounds: number;
   start_at: string | null;
+  prize_tier?: string;
   status: string;
   current_round: number;
   is_tie_breaker: boolean;
@@ -77,7 +79,12 @@ export type EntryResponse = {
   created_at: string;
   username?: string;
   breed_name?: string;
+  lineup?: { breed_id: number; breed_name?: string; slot_index: number }[];
 };
+
+export type LeaderboardPlayer = { rank: number; username: string; total_wins: number };
+export type LeaderboardBreed = { rank: number; breed_name: string; total_wins: number };
+export type LeaderboardSeasonal = { rank: number; username: string; season_wins: number };
 
 export type MatchResponse = {
   id: number;
@@ -103,3 +110,13 @@ export type StandingsRow = {
   losses: number;
   status: string;
 };
+
+/** Entry cost in coins by prize tier (must match backend config). */
+export const ENTRY_COST_BY_TIER: Record<string, number> = {
+  standard: 10,
+  grand: 25,
+  prestigious: 50,
+};
+export function entryCostForTier(tier: string): number {
+  return ENTRY_COST_BY_TIER[tier?.toLowerCase()] ?? 10;
+}

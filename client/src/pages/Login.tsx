@@ -45,6 +45,11 @@ export default function Login() {
       <p>
         No account? <Link to="/register">Register</Link>
       </p>
+      <p style={{ marginTop: "1rem" }}>
+        <a href={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/auth/google`} className="menu-btn" style={{ display: "inline-block" }}>
+          Sign in with Google
+        </a>
+      </p>
     </div>
   );
 }

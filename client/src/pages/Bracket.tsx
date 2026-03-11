@@ -17,6 +17,7 @@ export default function Bracket() {
   const [tournament, setTournament] = useState<TournamentResponse | null>(null);
   const [matches, setMatches] = useState<MatchResponse[]>([]);
   const [standings, setStandings] = useState<StandingsRow[]>([]);
+  const [viewMatch, setViewMatch] = useState<MatchResponse | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
 
   const fetchData = () => {
@@ -100,7 +101,12 @@ export default function Bracket() {
                       <p className={m.winner_entry_id === m.entry_b_id ? "winner" : ""}>
                         {m.entry_b_username || "—"} ({m.entry_b_breed || "—"})
                       </p>
-                      {m.status === "played" && <p className="result">Winner: {m.winner_entry_id === m.entry_a_id ? m.entry_a_username : m.entry_b_username}</p>}
+                      {m.status === "played" && (
+                        <>
+                          <p className="result">Winner: {m.winner_entry_id === m.entry_a_id ? m.entry_a_username : m.entry_b_username}</p>
+                          <button type="button" className="view-match-btn" onClick={() => setViewMatch(m)}>View match</button>
+                        </>
+                      )}
                     </>
                   )}
                 </li>
@@ -109,6 +115,32 @@ export default function Bracket() {
           </div>
         ))}
       </section>
+
+      {viewMatch && viewMatch.entry_a_username && viewMatch.entry_b_username && (
+        <div className="match-experience-overlay" role="dialog" aria-modal="true" onClick={() => setViewMatch(null)}>
+          <div className="match-experience arena-modal" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="match-experience-close" onClick={() => setViewMatch(null)} aria-label="Close">×</button>
+            <div className="arena-banners">
+              <div className="arena-banner left">
+                <span className="banner-name">{viewMatch.entry_a_username}</span>
+                <span className="banner-breed">{viewMatch.entry_a_breed || "—"}</span>
+              </div>
+              <div className="arena-banner right">
+                <span className="banner-name">{viewMatch.entry_b_username}</span>
+                <span className="banner-breed">{viewMatch.entry_b_breed || "—"}</span>
+              </div>
+            </div>
+            <p className="announcer-text">"{viewMatch.entry_a_username} entry… and {viewMatch.entry_b_username} entry!"</p>
+            <div className="match-result-screen">
+              {viewMatch.winner_entry_id === viewMatch.entry_a_id ? (
+                <p className="result-text">{viewMatch.entry_a_username}'s {viewMatch.entry_a_breed || "rooster"} scores a stunning win against {viewMatch.entry_b_username}'s {viewMatch.entry_b_breed || "rooster"}!</p>
+              ) : (
+                <p className="result-text">{viewMatch.entry_b_username}'s {viewMatch.entry_b_breed || "rooster"} scores a stunning win against {viewMatch.entry_a_username}'s {viewMatch.entry_a_breed || "rooster"}!</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

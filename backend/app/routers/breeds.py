@@ -18,6 +18,7 @@ async def list_breeds(db=Depends(get_db)):
             id=b.id,
             name=b.name,
             image_filename=b.image_filename,
+            description=getattr(b, "description", None),
             traits=[BreedTraitResponse(derby_type=t.derby_type, power=t.power, speed=t.speed, intelligence=t.intelligence, stamina=t.stamina, accuracy=t.accuracy) for t in b.traits],
         ))
     return out

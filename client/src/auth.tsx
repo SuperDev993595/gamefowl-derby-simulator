@@ -58,6 +58,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser();
   }, [fetchUser]);
 
+  useEffect(() => {
+    const onAuthUpdate = () => fetchUser();
+    window.addEventListener("auth-login", onAuthUpdate);
+    return () => window.removeEventListener("auth-login", onAuthUpdate);
+  }, [fetchUser]);
+
   const login = useCallback(async (email: string, password: string) => {
     const data = await api<TokenResponse>("/api/auth/login", {
       method: "POST",
