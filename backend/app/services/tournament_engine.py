@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models import Tournament, Entry, Match, BreedTrait, MatchStatus, EntryStatus, TournamentStatus
+from app.derby_modifiers import apply_derby_modifiers, apply_keep_modifiers
 
 
 def parse_rating_string(s: str) -> list[int]:
@@ -26,13 +27,25 @@ async def get_traits_for_breed_derby(db: AsyncSession, breed_id: int, derby_type
 
 
 def resolve_match(power_a: tuple, power_b: tuple, seed: int | None = None) -> int:
-    """Returns 1 if A wins, 2 if B wins. Weighted sum + randomness."""
+    """Returns 1 if A wins, 2 if B wins. Weighted sum + randomness. Accepts float tuples."""
     if seed is not None:
         random.seed(seed)
     weights = (0.25, 0.2, 0.2, 0.2, 0.15)
     score_a = sum(w * p for w, p in zip(weights, power_a)) + random.uniform(0, 1)
     score_b = sum(w * p for w, p in zip(weights, power_b)) + random.uniform(0, 1)
     return 1 if score_a >= score_b else 2
+
+
+async def get_adjusted_traits_for_entry(
+    db: AsyncSession,
+    entry: Entry,
+    derby_type: str,
+) -> tuple[float, float, float, float, float]:
+    """Base breed traits for this derby, then derby modifiers, then keep modifiers."""
+    base = await get_traits_for_breed_derby(db, entry.breed_id, derby_type)
+    after_derby = apply_derby_modifiers(base, derby_type)
+    keep_type = getattr(entry, "keep_type", None) or "bench"
+    return apply_keep_modifiers(after_derby, keep_type)
 
 
 def can_still_win(wins: int, losses: int, total_rounds: int, leader_wins: int) -> bool:
@@ -158,8 +171,8 @@ async def resolve_pending_matches_for_round(
         entry_b = await db.get(Entry, match.entry_b_id)
         if not entry_a or not entry_b:
             continue
-        traits_a = await get_traits_for_breed_derby(db, entry_a.breed_id, derby_type)
-        traits_b = await get_traits_for_breed_derby(db, entry_b.breed_id, derby_type)
+        traits_a = await get_adjusted_traits_for_entry(db, entry_a, derby_type)
+        traits_b = await get_adjusted_traits_for_entry(db, entry_b, derby_type)
         winner = 1 if resolve_match(traits_a, traits_b) == 1 else 2
         winner_id = entry_a.id if winner == 1 else entry_b.id
         loser_id = entry_b.id if winner == 1 else entry_a.id

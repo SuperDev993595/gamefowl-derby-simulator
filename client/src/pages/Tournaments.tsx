@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api, TournamentResponse } from "../api";
+import { api } from "../api";
+import type { TournamentResponse } from "../api";
 import { useAuth } from "../auth";
 import { useNavigate } from "react-router-dom";
 
 const DERBY_LABELS: Record<string, string> = {
   long_heel: "Long Heel",
   short_heel: "Short Heel",
-  long_blade: "Long Blade",
-  short_blade: "Short Blade",
+  pilipino: "Pilipino",
+  mexican: "Mexican",
+};
+
+const DERBY_DESCRIPTIONS: Record<string, string> = {
+  long_heel: "The favorite of the South.",
+  short_heel: "The old timer's favorite.",
+  pilipino: "Fast and furious.",
+  mexican: "Powerful but smart.",
 };
 
 export default function Tournaments() {
@@ -52,6 +60,11 @@ export default function Tournaments() {
             <li key={t.id} className="tournament-card">
               <h3>{t.name}</h3>
               <p>{DERBY_LABELS[t.derby_type] || t.derby_type} · {t.total_rounds} rounds</p>
+              {DERBY_DESCRIPTIONS[t.derby_type] && (
+                <p className="derby-desc">{DERBY_DESCRIPTIONS[t.derby_type]}</p>
+              )}
+              <p className="entry-fee">Entry fee: 10 coins</p>
+              <p className="prize-tier">Prize tier: Standard</p>
               <p>Status: <strong>{t.status}</strong> · Entries: {t.entry_count ?? 0}</p>
               {(t.status === "draft" || t.status === "scheduled") && (
                 <Link to={`/enter/${t.id}`}>Enter this derby</Link>

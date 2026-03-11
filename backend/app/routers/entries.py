@@ -23,10 +23,14 @@ async def enter_tournament(
         raise HTTPException(400, "Registration closed")
     if user.token_balance < settings.entry_cost_tokens:
         raise HTTPException(400, "Insufficient tokens")
+    keep_type = data.keep_type if hasattr(data, "keep_type") and data.keep_type else "bench"
+    if keep_type not in ("bench", "flypen"):
+        keep_type = "bench"
     entry = Entry(
         tournament_id=tournament_id,
         user_id=user.id,
         breed_id=data.breed_id,
+        keep_type=keep_type,
         token_cost_paid=settings.entry_cost_tokens,
     )
     db.add(entry)
@@ -40,6 +44,7 @@ async def enter_tournament(
         tournament_id=entry.tournament_id,
         user_id=entry.user_id,
         breed_id=entry.breed_id,
+        keep_type=getattr(entry, "keep_type", "bench"),
         token_cost_paid=entry.token_cost_paid,
         status=entry.status,
         wins=entry.wins,

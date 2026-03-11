@@ -85,6 +85,7 @@ class TournamentResponse(BaseModel):
 
 class EntryCreate(BaseModel):
     breed_id: int
+    keep_type: str = "bench"
 
 
 class EntryResponse(BaseModel):
@@ -92,6 +93,7 @@ class EntryResponse(BaseModel):
     tournament_id: int
     user_id: int
     breed_id: int
+    keep_type: str = "bench"
     token_cost_paid: int
     status: str
     wins: int

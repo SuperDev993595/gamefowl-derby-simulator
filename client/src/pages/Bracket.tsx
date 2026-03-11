@@ -1,13 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { api, TournamentResponse, MatchResponse, StandingsRow } from "../api";
+import { api } from "../api";
+import type { TournamentResponse, MatchResponse, StandingsRow } from "../api";
 import { useAuth } from "../auth";
 
 const DERBY_LABELS: Record<string, string> = {
   long_heel: "Long Heel",
   short_heel: "Short Heel",
-  long_blade: "Long Blade",
-  short_blade: "Short Blade",
+  pilipino: "Pilipino",
+  mexican: "Mexican",
 };
 
 export default function Bracket() {

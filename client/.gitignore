@@ -22,14 +22,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-backend/app/__pycache__/*
-backend/app/routers/__pycache__/*
-backend/app/services/__pycache__/*
-backend/app/models/__pycache__/*
-backend/app/schemas/__pycache__/*
-backend/app/auth/__pycache__/*
-backend/app/database/__pycache__/*
-backend/app/config/__pycache__/*
-backend/app/main/__pycache__/*
-backend/app/seed_db/__pycache__/*
-backend/app/websocket_manager/__pycache__/*
+

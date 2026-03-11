@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
-import { api, TokenResponse, UserResponse } from "./api";
+import { api } from "./api";
+import type { TokenResponse, UserResponse } from "./api";
 
 type AuthState = {
   token: string | null;

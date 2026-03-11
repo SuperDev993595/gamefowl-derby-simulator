@@ -1,6 +1,41 @@
 * { box-sizing: border-box; }
 body { margin: 0; font-family: system-ui, sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
 a { color: #7eb8da; }
+
+/* Home landing (doc: Pre-Game Landing Page) */
+.home-landing { text-align: center; padding-top: 2rem; }
+.game-title { font-size: 2.5rem; letter-spacing: 0.15em; font-weight: 800; margin-bottom: 0.5rem; text-shadow: 0 0 20px rgba(200,180,120,0.4); }
+.tagline { color: #aaa; margin-bottom: 2rem; }
+.main-menu { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; align-items: center; }
+.menu-btn { display: inline-block; padding: 0.75rem 1.25rem; background: #252545; border: 2px solid #444; border-radius: 8px; font-weight: 600; transition: border-color 0.2s, box-shadow 0.2s; }
+.menu-btn:hover { border-color: #7eb8da; box-shadow: 0 0 12px rgba(126, 184, 218, 0.3); }
+.balance-inline { margin-left: 1rem; font-weight: 600; color: #8d8; }
+
+.section-desc { color: #aaa; margin-bottom: 1rem; }
+.muted { color: #666; font-size: 0.9rem; }
+.leaderboards-placeholder, .settings-placeholder { background: #252545; padding: 2rem; border-radius: 8px; margin-top: 1rem; }
+.derby-filter { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.breed-gallery.my-entry-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+.breed-card-large { background: #252545; padding: 1rem; border-radius: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.breed-card-large img { width: 120px; height: 120px; object-fit: cover; border-radius: 6px; }
+.breed-card-large h3 { margin: 0.5rem 0 0.25rem; font-size: 1rem; }
+.breed-description { font-size: 0.8rem; color: #aaa; margin: 0.25rem 0; flex-grow: 1; }
+.link-button { display: inline-block; margin-top: 0.5rem; font-size: 0.85rem; }
+
+/* Entry confirmation & lineup bar (doc) */
+.entry-confirmation { background: #252545; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; border: 2px solid #7eb8da; }
+.entry-confirmation h3 { margin-top: 0; }
+.entry-lineup-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; padding: 0.75rem; background: #1a1a2e; border-radius: 6px; margin: 1rem 0; min-height: 50px; }
+.entry-lineup-bar .lineup-label { margin-right: 0.5rem; color: #aaa; font-size: 0.9rem; }
+.entry-lineup-bar .lineup-slot { padding: 0.25rem 0.5rem; background: #252545; border-radius: 4px; font-size: 0.85rem; }
+.confirmation-actions { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+.entry-fee, .prize-tier { color: #8d8; font-size: 0.9rem; }
+.tournament-card .entry-fee { margin-top: 0.25rem; }
+.attr-preview { margin-top: 1rem; font-size: 0.85rem; color: #aaa; }
+.attr-preview .attr-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.25rem 0; }
+.attr-preview .attr-name { width: 90px; }
+.attr-preview .attr-bar { flex: 1; height: 8px; background: #333; border-radius: 4px; overflow: hidden; }
+.attr-preview .attr-fill { height: 100%; background: #7eb8da; border-radius: 4px; }
 button, input, select { padding: 0.5rem 0.75rem; margin: 0.25rem; border-radius: 6px; border: 1px solid #444; background: #2a2a4a; color: #eee; }
 button:disabled { opacity: 0.6; }
 button:not(:disabled):hover { background: #3a3a5a; }
@@ -21,6 +56,14 @@ button:not(:disabled):hover { background: #3a3a5a; }
 .breed-card.selected { border-color: #7eb8da; }
 .breed-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
 .breed-card span { font-size: 0.85rem; margin-top: 0.25rem; }
+.breed-qualities { list-style: none; padding: 0; margin: 0.25rem 0 0; font-size: 0.75rem; color: #aaa; text-align: left; }
+.breed-qualities li { margin: 0.1rem 0; }
+.keep-selection { margin: 1rem 0; padding: 1rem; background: #252545; border-radius: 8px; }
+.keep-selection h3 { margin: 0 0 0.5rem; }
+.keep-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.keep-options label { display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; padding: 0.5rem; border-radius: 6px; border: 2px solid transparent; }
+.keep-options label.selected { border-color: #7eb8da; background: rgba(126, 184, 218, 0.1); }
+.derby-desc { color: #aaa; font-size: 0.9rem; margin-top: 0.25rem; }
 .standings table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
 .standings th, .standings td { padding: 0.5rem; text-align: left; border-bottom: 1px solid #333; }
 .standings .winner-msg { color: #8d8; }

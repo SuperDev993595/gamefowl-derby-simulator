@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+*.egg-info/
+*.egg
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/venv/
+venv/
+.venv/
+env/
+.env
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Local / env
+*.local
+
+# Editor and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing / coverage
+coverage/
+.nyc_output/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Misc
+*.bak
+*.tmp
+.cache/
+
+backend/app/_pycache__/
+backend/app/routers/__pycache__/
+backend/app/services/__pycache__/*
+backend/app/models/__pycache__/*
+backend/app/schemas/__pycache__/*
+backend/app/auth/__pycache__/*
+backend/app/database/__pycache__/*
+backend/app/config/__pycache__/*
+backend/app/main/__pycache__/*
+backend/app/seed_db/__pycache__/*
+backend/app/websocket_manager/__pycache__/*

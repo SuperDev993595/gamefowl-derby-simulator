@@ -69,6 +69,7 @@ export type EntryResponse = {
   tournament_id: number;
   user_id: number;
   breed_id: number;
+  keep_type?: string;
   token_cost_paid: number;
   status: string;
   wins: number;

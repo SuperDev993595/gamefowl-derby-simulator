@@ -26,8 +26,13 @@ class MatchStatus(str, enum.Enum):
 class DerbyType(str, enum.Enum):
     LONG_HEEL = "long_heel"
     SHORT_HEEL = "short_heel"
-    LONG_BLADE = "long_blade"
-    SHORT_BLADE = "short_blade"
+    PILIPINO = "pilipino"
+    MEXICAN = "mexican"
+
+
+class KeepType(str, enum.Enum):
+    BENCH = "bench"
+    FLYPEN = "flypen"
 
 
 class User(Base):
@@ -79,7 +84,11 @@ class Tournament(Base):
     winner_entry_id: Mapped[int | None] = mapped_column(ForeignKey("entries.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    entries: Mapped[list["Entry"]] = relationship("Entry", back_populates="tournament")
+    entries: Mapped[list["Entry"]] = relationship(
+        "Entry",
+        back_populates="tournament",
+        foreign_keys="Entry.tournament_id",
+    )
     matches: Mapped[list["Match"]] = relationship("Match", back_populates="tournament")
 
 
@@ -89,6 +98,7 @@ class Entry(Base):
     tournament_id: Mapped[int] = mapped_column(ForeignKey("tournaments.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     breed_id: Mapped[int] = mapped_column(ForeignKey("breeds.id"), nullable=False)
+    keep_type: Mapped[str] = mapped_column(String(32), default=KeepType.BENCH.value)
     token_cost_paid: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[str] = mapped_column(String(32), default=EntryStatus.ACTIVE.value)
     wins: Mapped[int] = mapped_column(Integer, default=0)
@@ -96,7 +106,11 @@ class Entry(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship("User", back_populates="entries")
-    tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="entries")
+    tournament: Mapped["Tournament"] = relationship(
+        "Tournament",
+        back_populates="entries",
+        foreign_keys=[tournament_id],
+    )
     breed: Mapped["Breed"] = relationship("Breed")
 
 
